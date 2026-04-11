@@ -116,6 +116,8 @@ private val strFr = mapOf(
     "successPerStepDesc" to "Animation de succès après chaque étape",
     "faceMatch" to "Face Match",
     "faceMatchDesc" to "Comparer le selfie avec la photo du document",
+    "amlScreening" to "Screening AML",
+    "amlScreeningDesc" to "Vérification des sanctions et listes AML",
     "challengeAudio" to "Audio des challenges",
     "challengeAudioDesc" to "Jouer les instructions audio pour chaque challenge",
     "language" to "Langue",
@@ -242,6 +244,8 @@ private val strEn = mapOf(
     "successPerStepDesc" to "Success animation after each step",
     "faceMatch" to "Face Match",
     "faceMatchDesc" to "Compare selfie with document photo",
+    "amlScreening" to "AML Screening",
+    "amlScreeningDesc" to "Sanctions & AML watchlist screening",
     "challengeAudio" to "Challenge Audio",
     "challengeAudioDesc" to "Play audio instructions for each challenge",
     "language" to "Language",
@@ -368,6 +372,8 @@ private val strWo = mapOf(
     "successPerStepDesc" to "Wone yëgge bu baax",
     "faceMatch" to "Seetu kanam",
     "faceMatchDesc" to "Seetante selfie ak nataal kaart bi",
+    "amlScreening" to "Seetu AML",
+    "amlScreeningDesc" to "Seet ci limu sanction yi ak AML",
     "challengeAudio" to "Audio jëf yi",
     "challengeAudioDesc" to "Déglu ndigal audio yi",
     "language" to "Làkk",
@@ -570,6 +576,7 @@ fun KyvShieldDemoPage() {
     var showResultPage       by remember { mutableStateOf(false) }
     var showSuccessPerStep   by remember { mutableStateOf(true) }
     var requireFaceMatch     by remember { mutableStateOf(false) }
+    var requireAml           by remember { mutableStateOf(false) }
     var playChallengeAudio   by remember { mutableStateOf(true) }
 
     // ── KYC identifier
@@ -756,6 +763,7 @@ fun KyvShieldDemoPage() {
             showResultPage      = showResultPage,
             showSuccessPerStep  = showSuccessPerStep,
             requireFaceMatch    = requireFaceMatch,
+            requireAml          = requireAml,
             language            = selectedLanguage,
             target              = selectedDocument,
             kycIdentifier       = kycIdentifier.trim().ifEmpty { null },
@@ -983,12 +991,14 @@ fun KyvShieldDemoPage() {
                         showResultPage       = showResultPage,
                         showSuccessPerStep   = showSuccessPerStep,
                         requireFaceMatch     = requireFaceMatch,
+                        requireAml           = requireAml,
                         playChallengeAudio   = playChallengeAudio,
                         onShowIntroPage      = { showIntroPage = it },
                         onShowInstructionPages = { showInstructionPages = it },
                         onShowResultPage     = { showResultPage = it },
                         onShowSuccessPerStep = { showSuccessPerStep = it },
                         onRequireFaceMatch   = { requireFaceMatch = it },
+                        onRequireAml         = { requireAml = it },
                         onPlayChallengeAudio = { playChallengeAudio = it },
                         kycIdentifier        = kycIdentifier,
                         onKycIdentifierChange = { kycIdentifier = it },
@@ -1138,12 +1148,14 @@ fun ConfigCard(
     showResultPage: Boolean,
     showSuccessPerStep: Boolean,
     requireFaceMatch: Boolean,
+    requireAml: Boolean,
     playChallengeAudio: Boolean,
     onShowIntroPage: (Boolean) -> Unit,
     onShowInstructionPages: (Boolean) -> Unit,
     onShowResultPage: (Boolean) -> Unit,
     onShowSuccessPerStep: (Boolean) -> Unit,
     onRequireFaceMatch: (Boolean) -> Unit,
+    onRequireAml: (Boolean) -> Unit,
     onPlayChallengeAudio: (Boolean) -> Unit,
     kycIdentifier: String,
     onKycIdentifierChange: (String) -> Unit,
@@ -1418,6 +1430,7 @@ fun ConfigCard(
             SwitchTile(title = t("resultPage"), subtitle = t("resultPageDesc"), icon = { CheckSquareIcon(textTertiary, 18.dp) }, value = showResultPage, onChanged = onShowResultPage, primaryColor = primaryColor, fonts = fonts, textPrimary = textPrimary, textTertiary = textTertiary)
             SwitchTile(title = t("successPerStep"), subtitle = t("successPerStepDesc"), icon = { SparklesIcon(textTertiary, 18.dp) }, value = showSuccessPerStep, onChanged = onShowSuccessPerStep, primaryColor = primaryColor, fonts = fonts, textPrimary = textPrimary, textTertiary = textTertiary)
             SwitchTile(title = t("faceMatch"), subtitle = t("faceMatchDesc"), icon = { ScanFaceIcon(textTertiary, 18.dp) }, value = requireFaceMatch, onChanged = onRequireFaceMatch, primaryColor = primaryColor, fonts = fonts, textPrimary = textPrimary, textTertiary = textTertiary)
+            SwitchTile(title = t("amlScreening"), subtitle = t("amlScreeningDesc"), icon = { ShieldIcon(textTertiary, 18.dp) }, value = requireAml, onChanged = onRequireAml, primaryColor = primaryColor, fonts = fonts, textPrimary = textPrimary, textTertiary = textTertiary)
             SwitchTile(title = t("challengeAudio"), subtitle = t("challengeAudioDesc"), icon = { Volume2Icon(textTertiary, 18.dp) }, value = playChallengeAudio, onChanged = onPlayChallengeAudio, primaryColor = primaryColor, fonts = fonts, textPrimary = textPrimary, textTertiary = textTertiary)
 
             Spacer(Modifier.height(16.dp))
