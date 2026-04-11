@@ -199,6 +199,14 @@ private val strFr = mapOf(
     "errorDecodeImage" to "Erreur: impossible de décoder l'image",
     "intro" to "Intro",
     "instructions" to "Instructions",
+    "amlScreening" to "Screening AML / Sanctions",
+    "amlStatus" to "Statut",
+    "amlRiskLevel" to "Niveau de risque",
+    "amlMatches" to "Correspondances",
+    "amlClear" to "Aucune correspondance",
+    "amlMatch" to "Correspondance trouvée",
+    "amlError" to "Erreur de screening",
+    "amlDisabled" to "Désactivé",
     "selectAtLeastOneStep" to "Sélectionnez au moins une étape",
     "noDocumentAvailable" to "Aucun document disponible",
     "selectDocument" to "Sélectionner un document",
@@ -317,6 +325,14 @@ private val strEn = mapOf(
     "errorDecodeImage" to "Error: unable to decode image",
     "intro" to "Intro",
     "instructions" to "Instructions",
+    "amlScreening" to "AML / Sanctions Screening",
+    "amlStatus" to "Status",
+    "amlRiskLevel" to "Risk Level",
+    "amlMatches" to "Matches",
+    "amlClear" to "No matches found",
+    "amlMatch" to "Match found",
+    "amlError" to "Screening error",
+    "amlDisabled" to "Disabled",
     "selectAtLeastOneStep" to "Select at least one step",
     "noDocumentAvailable" to "No document available",
     "selectDocument" to "Select a document",
@@ -435,6 +451,14 @@ private val strWo = mapOf(
     "errorDecodeImage" to "Njumte: mënu ko decode nataal bi",
     "intro" to "Intro",
     "instructions" to "Ndigal",
+    "amlScreening" to "Seet AML / Sanctions",
+    "amlStatus" to "Wàllu",
+    "amlRiskLevel" to "Tolluwaayu riskk",
+    "amlMatches" to "Seetante",
+    "amlClear" to "Amul seetante",
+    "amlMatch" to "Am na seetante",
+    "amlError" to "Njumte ci seet bi",
+    "amlDisabled" to "Tëj nañu ko",
     "selectAtLeastOneStep" to "Tànnal benn etap bu mag",
     "noDocumentAvailable" to "Amul kaart bu am",
     "selectDocument" to "Tànnal benn kaart",
@@ -2104,6 +2128,12 @@ fun ResultSection(
             FaceVerificationCard(result = result, primaryColor = primaryColor, cardColor = cardColor, borderColor = borderColor, inputBg = inputBg, chipBg = chipBg, chipText = chipText, textPrimary = textPrimary, textSecondary = textSecondary, fonts = fonts, monoFonts = monoFonts, t = t)
         }
 
+        // AML Screening
+        result.amlScreening?.let { aml ->
+            Spacer(Modifier.height(16.dp))
+            AmlScreeningCard(aml = aml, primaryColor = primaryColor, cardColor = cardColor, borderColor = borderColor, textPrimary = textPrimary, textSecondary = textSecondary, fonts = fonts, t = t)
+        }
+
         // Component scores
         if (result.rectoResult != null || result.versoResult != null) {
             Spacer(Modifier.height(16.dp))
@@ -2114,6 +2144,48 @@ fun ResultSection(
         if (hasAnalysis) {
             Spacer(Modifier.height(16.dp))
             ProcessingTimesCard(result = result, primaryColor = primaryColor, cardColor = cardColor, borderColor = borderColor, textPrimary = textPrimary, fonts = fonts, t = t)
+        }
+    }
+}
+
+@Composable
+fun AmlScreeningCard(aml: AMLScreening, primaryColor: Color, cardColor: Color, borderColor: Color, textPrimary: Color, textSecondary: Color, fonts: FontFamily, t: (String) -> String) {
+    val isClear = aml.status == "clear"
+    val isMatch = aml.status == "match"
+    val color = if (isClear) primaryColor else if (isMatch) Color.Red else Color(0xFFF97316)
+    val statusLabel = when (aml.status) {
+        "clear" -> t("amlClear")
+        "match" -> t("amlMatch")
+        "error" -> t("amlError")
+        else    -> t("amlDisabled")
+    }
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = color.copy(alpha = 0.05f)), border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f)), elevation = CardDefaults.cardElevation(0.dp)) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                ShieldCheckIcon(color, 20.dp)
+                Spacer(Modifier.width(8.dp))
+                Text(t("amlScreening"), style = TextStyle(fontFamily = fonts, fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = color), modifier = Modifier.weight(1f))
+                Box(modifier = Modifier.clip(RoundedCornerShape(20.dp)).background(cardColor).border(1.dp, color.copy(alpha = 0.3f), RoundedCornerShape(20.dp)).padding(horizontal = 12.dp, vertical = 6.dp)) {
+                    Text(aml.status.uppercase(), style = TextStyle(fontFamily = fonts, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = color))
+                }
+            }
+            Spacer(Modifier.height(12.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(t("amlStatus"), style = TextStyle(fontFamily = fonts, fontSize = 13.sp, color = textSecondary))
+                Text(statusLabel, style = TextStyle(fontFamily = fonts, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = color))
+            }
+            Spacer(Modifier.height(8.dp))
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(t("amlRiskLevel"), style = TextStyle(fontFamily = fonts, fontSize = 13.sp, color = textSecondary))
+                Text(aml.riskLevel.uppercase(), style = TextStyle(fontFamily = fonts, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = color))
+            }
+            if (aml.totalMatches > 0) {
+                Spacer(Modifier.height(8.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(t("amlMatches"), style = TextStyle(fontFamily = fonts, fontSize = 13.sp, color = textSecondary))
+                    Text("${aml.totalMatches}", style = TextStyle(fontFamily = fonts, fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.Red))
+                }
+            }
         }
     }
 }
